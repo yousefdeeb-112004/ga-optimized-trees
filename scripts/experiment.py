@@ -66,8 +66,8 @@ def run_ga_experiment(X, y, dataset_name, n_folds=5):
         
         # Create GA components
         ga_config = GAConfig(
-            population_size=50,  # Smaller for speed
-            n_generations=30,
+            population_size=100,  # Increase from 50
+            n_generations=50,     # Increase from 30
             crossover_prob=0.7,
             mutation_prob=0.2,
             tournament_size=3,
@@ -84,8 +84,8 @@ def run_ga_experiment(X, y, dataset_name, n_folds=5):
         
         fitness_calc = FitnessCalculator(
             mode='weighted_sum',
-            accuracy_weight=0.7,
-            interpretability_weight=0.3
+            accuracy_weight=0.5,           # Reduce from 0.7
+            interpretability_weight=0.5    # Increase from 0.3
         )
         
         mutation = Mutation(n_features=n_features, feature_ranges=feature_ranges)
