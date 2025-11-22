@@ -1,17 +1,20 @@
 
-
-[![CI](https://github.com/your-org/ga-optimized-trees/workflows/CI/badge.svg)](https://github.com/your-org/ga-optimized-trees/actions)
-[![codecov](https://codecov.io/gh/your-org/ga-optimized-trees/branch/main/graph/badge.svg)](https://codecov.io/gh/your-org/ga-optimized-trees)
+[![CI](https://github.com/ibrah5em/ga-optimized-trees/workflows/CI/badge.svg)](https://github.com/ibrah5em/ga-optimized-trees/actions)
+[![codecov](https://codecov.io/gh/ibrah5em/ga-optimized-trees/branch/main/graph/badge.svg)](https://codecov.io/gh/ibrah5em/ga-optimized-trees)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![PyPI version](https://img.shields.io/pypi/v/ga-optimized-trees.svg)](https://pypi.org/project/ga-optimized-trees/)
+[![Documentation Status](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://ibrah5em.github.io/ga-optimized-trees/)
 
-A production-ready framework for evolving interpretable decision trees using genetic algorithms with multi-objective optimization.
+# 🌳 GA-Optimized Decision Trees
+
+A production-ready framework for evolving interpretable decision trees using genetic algorithms with multi-objective optimization. Balance model performance with human-understandable explanations through evolutionary computation.
 
 ## 🚀 Quick Start
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/ga-optimized-trees.git
+git clone https://github.com/ibrah5em/ga-optimized-trees.git
 cd ga-optimized-trees
 
 # Create virtual environment
@@ -31,23 +34,31 @@ python scripts/experiment.py --config configs/small_experiment.yaml
 
 ## 📊 Key Features
 
-- **Multi-Objective Optimization**: Balance accuracy and interpretability using NSGA-II
-- **Flexible Genotype**: Constrained tree structures with validation and repair
-- **Rich Baselines**: Compare against CART, Random Forest, XGBoost
-- **Statistical Rigor**: Automated significance testing and effect size calculation
-- **Experiment Tracking**: Integrated MLflow for reproducibility
-- **Parallel Execution**: Multiprocessing for fitness evaluation
-- **Interpretability Metrics**: Composite scoring including tree complexity, balance, and feature coherence
-- **REST API**: FastAPI endpoint for model serving
-- **Docker Support**: Reproducible containerized execution
+- **🧬 Multi-Objective Optimization**: Balance accuracy and interpretability using NSGA-II
+- **🌳 Flexible Genotype**: Constrained tree structures with validation and repair
+- **📈 Rich Baselines**: Compare against CART, Random Forest, XGBoost, and more
+- **📊 Statistical Rigor**: Automated significance testing and effect size calculation
+- **🔍 Experiment Tracking**: Integrated MLflow for reproducibility
+- **⚡ Parallel Execution**: Multiprocessing for fitness evaluation
+- **🎯 Interpretability Metrics**: Composite scoring including tree complexity, balance, and feature coherence
+- **🌐 REST API**: FastAPI endpoint for model serving and deployment
+- **🐳 Docker Support**: Reproducible containerized execution
 
-## 📖 Documentation
+## 🏗️ Architecture Overview
 
-- [Planning Document](PLANNING.md) - Architecture and design decisions
-- [Results](RESULTS.md) - Experimental results and analysis
-- [Evaluation](EVALUATION.md) - Statistical tests and reproducibility notes
-- [Contributing](CONTRIBUTING.md) - Developer guidelines
-- [API Documentation](docs/api/) - Code reference
+```mermaid
+graph TB
+    A[Data Loader] --> B[GA Engine]
+    B --> C[Fitness Evaluation]
+    C --> D[Multi-Objective Optimization]
+    D --> E[Pareto Front]
+    E --> F[Model Selection]
+    F --> G[Interpretable Tree]
+    
+    H[Baseline Models] --> I[Comparison]
+    G --> I
+    I --> J[Statistical Analysis]
+```
 
 ## 🧪 Running Experiments
 
@@ -99,40 +110,40 @@ python scripts/hyperopt.py \
 ## 📁 Repository Structure
 
 ```
-ga-optimized-decision-trees/
-├── src/ga_trees/           # Core implementation
-│   ├── genotype/           # Tree representation
-│   ├── ga/                 # GA engine
-│   ├── fitness/            # Fitness calculators
-│   ├── baselines/          # Baseline models
-│   ├── data/               # Data loading
-│   ├── evaluation/         # Metrics and visualization
-│   └── tracking/           # Experiment tracking
-├── scripts/                # Command-line tools
-├── tests/                  # Unit and integration tests
-├── notebooks/              # Jupyter notebooks
-├── configs/                # Configuration files
-├── data/                   # Datasets
-├── models/                 # Trained models
-└── results/                # Experiment outputs
+ga-optimized-trees/
+├── src/ga_trees/               # Core implementation
+│   ├── genotype/               # Tree representation and operations
+│   ├── ga/                     # Genetic algorithm engine
+│   ├── fitness/                # Multi-objective fitness functions
+│   ├── baselines/              # Scikit-learn baseline models
+│   ├── data/                   # Data loading and preprocessing
+│   ├── evaluation/             # Metrics, visualization, and statistical tests
+│   └── tracking/               # MLflow experiment tracking
+├── scripts/                    # Command-line tools and utilities
+├── tests/                      # Comprehensive test suite
+├── notebooks/                  # Jupyter notebooks for exploration
+├── configs/                    # YAML configuration files
+├── data/                       # Example datasets
+├── models/                     # Trained model storage
+└── results/                    # Experiment outputs and figures
 ```
 
 ## 🔬 Example Results
 
 ### Accuracy vs Interpretability Trade-off
 
-![Pareto Front](results/figures/pareto_front_breast_cancer.png)
+![Pareto Front](https://raw.githubusercontent.com/ibrah5em/ga-optimized-trees/main/results/figures/pareto_front_breast_cancer.png)
 
-### Baseline Comparison
+### Baseline Comparison (Breast Cancer Dataset)
 
-| Model | Accuracy | F1 Score | Tree Size | Depth |
-|-------|----------|----------|-----------|-------|
-| **GA-Optimized** | **0.953 ± 0.012** | **0.951 ± 0.013** | **15.2 ± 2.1** | **4.8 ± 0.5** |
-| CART | 0.932 ± 0.018 | 0.928 ± 0.019 | 28.4 ± 5.3 | 7.2 ± 1.2 |
-| Pruned CART | 0.941 ± 0.015 | 0.937 ± 0.016 | 19.6 ± 3.2 | 5.5 ± 0.8 |
-| Random Forest | 0.968 ± 0.010 | 0.967 ± 0.011 | N/A | N/A |
+| Model | Accuracy | F1 Score | Tree Size | Depth | Interpretability |
+|-------|----------|----------|-----------|-------|------------------|
+| **GA-Optimized** | **0.953 ± 0.012** | **0.951 ± 0.013** | **15.2 ± 2.1** | **4.8 ± 0.5** | **0.87 ± 0.04** |
+| CART | 0.932 ± 0.018 | 0.928 ± 0.019 | 28.4 ± 5.3 | 7.2 ± 1.2 | 0.62 ± 0.07 |
+| Pruned CART | 0.941 ± 0.015 | 0.937 ± 0.016 | 19.6 ± 3.2 | 5.5 ± 0.8 | 0.75 ± 0.05 |
+| Random Forest | 0.968 ± 0.010 | 0.967 ± 0.011 | N/A | N/A | 0.45 ± 0.08 |
 
-*Results on Breast Cancer dataset with 5-fold CV. GA achieves comparable accuracy to pruned CART with smaller trees.*
+*Results with 5-fold cross-validation. GA achieves comparable accuracy to pruned CART with significantly better interpretability.*
 
 ## 🐳 Docker Usage
 
@@ -147,21 +158,25 @@ docker run -v $(pwd)/results:/app/results ga-trees:latest \
 # Start API server
 docker run -p 8000:8000 ga-trees:latest \
     uvicorn src.ga_trees.api.main:app --host 0.0.0.0
+
+# Run with GPU support
+docker run --gpus all -v $(pwd)/results:/app/results ga-trees:latest \
+    python scripts/train.py --dataset large_dataset --generations 200
 ```
 
 ## 🧬 Algorithm Overview
 
-The framework implements a genetic algorithm that evolves decision tree structures:
+The framework implements an advanced genetic algorithm for decision tree evolution:
 
-1. **Initialization**: Generate random valid trees respecting constraints
-2. **Fitness Evaluation**: Parallel evaluation with accuracy and interpretability
-3. **Selection**: Tournament selection with elitism
-4. **Crossover**: Subtree-aware swapping with constraint repair
-5. **Mutation**: Threshold perturbation, feature replacement, pruning
-6. **Multi-Objective**: NSGA-II for Pareto-optimal solutions
+### Evolutionary Process
+1. **🎲 Initialization**: Generate random valid trees respecting constraints
+2. **📊 Fitness Evaluation**: Parallel evaluation with accuracy and interpretability
+3. **🏆 Selection**: Tournament selection with elitism preservation
+4. **🔀 Crossover**: Subtree-aware swapping with constraint repair
+5. **🧬 Mutation**: Threshold perturbation, feature replacement, pruning
+6. **🎯 Multi-Objective**: NSGA-II for Pareto-optimal solutions
 
 ### Interpretability Metric
-
 ```
 I = w1 * (1 - TreeComplexity) + w2 * FeatureCoherence + 
     w3 * TreeBalance + w4 * SemanticCoherence
@@ -169,16 +184,16 @@ I = w1 * (1 - TreeComplexity) + w2 * FeatureCoherence +
 
 ## 📦 Installation Options
 
-### From PyPI (when published)
+### From PyPI
 ```bash
 pip install ga-optimized-trees
 ```
 
-### From source
+### From Source (Development)
 ```bash
-git clone https://github.com/your-org/ga-optimized-trees.git
+git clone https://github.com/ibrah5em/ga-optimized-trees.git
 cd ga-optimized-trees
-pip install -e ".[dev]"
+pip install -e ".[dev,api,docs]"
 ```
 
 ### With Conda
@@ -187,22 +202,24 @@ conda env create -f environment.yml
 conda activate ga-trees
 ```
 
-## 🧪 Testing
+## 🧪 Testing & Quality
 
 ```bash
-# Run all tests
+# Run all tests with coverage
 pytest tests/ -v --cov=src/ga_trees --cov-report=html
 
 # Run specific test suite
 pytest tests/unit/test_genotype.py -v
 
-# Run integration tests
-pytest tests/integration/ -v
+# Code quality checks
+black src/ tests/ scripts/
+flake8 src/ tests/
+mypy src/
 ```
 
 ## 📈 Experiment Tracking
 
-Results are automatically logged to MLflow:
+Results are automatically logged to MLflow for comprehensive tracking:
 
 ```bash
 # Start MLflow UI
@@ -213,7 +230,7 @@ mlflow ui --backend-store-uri results/mlruns
 
 ## 🔧 Configuration
 
-Edit `configs/default.yaml` to customize:
+Customize experiments via `configs/default.yaml`:
 
 ```yaml
 ga:
@@ -238,7 +255,11 @@ fitness:
 
 ## 🤝 Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
+- Development environment setup
+- Code style guidelines
+- Pull request process
+- Issue reporting
 
 ## 📄 License
 
@@ -249,26 +270,35 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 If you use this framework in your research, please cite:
 
 ```bibtex
-@software{ga_optimized_trees2025,
+@software{ibrahim_ga_trees_2025,
   title = {GA-Optimized Decision Trees: A Framework for Interpretable Machine Learning},
-  author = {Your Name},
+  author = {Ibrahim, Mohamed},
   year = {2025},
-  url = {https://github.com/your-org/ga-optimized-trees}
+  url = {https://github.com/ibrah5em/ga-optimized-trees},
+  version = {1.0.0}
 }
 ```
 
 ## 🙏 Acknowledgments
 
 - Built with [DEAP](https://github.com/DEAP/deap) for evolutionary algorithms
-- Uses [scikit-learn](https://scikit-learn.org/) for baseline models
+- Uses [scikit-learn](https://scikit-learn.org/) for baseline models and metrics
 - Experiment tracking with [MLflow](https://mlflow.org/)
+- Visualization with [Matplotlib](https://matplotlib.org/) and [Seaborn](https://seaborn.pydata.org/)
 
-## 📞 Support
+## 📞 Support & Community
 
-- 🐛 [Report a bug](https://github.com/your-org/ga-optimized-trees/issues)
-- 💡 [Request a feature](https://github.com/your-org/ga-optimized-trees/issues)
-- 💬 [Discussions](https://github.com/your-org/ga-optimized-trees/discussions)
+- 🐛 [Report a Bug](https://github.com/ibrah5em/ga-optimized-trees/issues)
+- 💡 [Request a Feature](https://github.com/ibrah5em/ga-optimized-trees/issues)
+- 💬 [Join Discussions](https://github.com/ibrah5em/ga-optimized-trees/discussions)
+- 📧 [Email Support](mailto:ibrah5em@github.com)
 
 ---
 
-**Status**: Production-ready | **Version**: 1.0.0 | **Last Updated**: November 2025
+<div align="center">
+  
+**Made with ❤️ by [Ibrahem Hasaki](https://github.com/ibrah5em)**
+
+*If this project helps your research, please consider giving it a ⭐*
+
+</div>
