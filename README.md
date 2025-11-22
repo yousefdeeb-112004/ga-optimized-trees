@@ -1,9 +1,6 @@
 
-[![CI](https://github.com/ibrah5em/ga-optimized-trees/workflows/CI/badge.svg)](https://github.com/ibrah5em/ga-optimized-trees/actions)
-[![codecov](https://codecov.io/gh/ibrah5em/ga-optimized-trees/branch/main/graph/badge.svg)](https://codecov.io/gh/ibrah5em/ga-optimized-trees)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![PyPI version](https://img.shields.io/pypi/v/ga-optimized-trees.svg)](https://pypi.org/project/ga-optimized-trees/)
 [![Documentation Status](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://ibrah5em.github.io/ga-optimized-trees/)
 
 # 🌳 GA-Optimized Decision Trees
