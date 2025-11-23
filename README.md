@@ -234,20 +234,6 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 📚 Citation
-
-If you use this framework in your research, please cite:
-
-```bibtex
-@software{ibrahim_ga_trees_2025,
-  title = {GA-Optimized Decision Trees: A Framework for Interpretable Machine Learning},
-  author = {Ibrahim, Mohamed},
-  year = {2025},
-  url = {https://github.com/ibrah5em/ga-optimized-trees},
-  version = {1.0.0}
-}
-```
-
 ## 🙏 Acknowledgments
 
 - Built with [DEAP](https://github.com/DEAP/deap) for evolutionary algorithms
