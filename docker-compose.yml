@@ -1,29 +1,88 @@
 version: '3.8'
 
 services:
-  ga-trees:
-    build: .
+  # Main GA training service
+  ga-train:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ga-trees-train
     volumes:
       - ./results:/app/results
       - ./models:/app/models
       - ./data:/app/data
       - ./configs:/app/configs
     environment:
-      - MLFLOW_TRACKING_URI=/app/results/mlruns
-    command: python scripts/experiment.py --config configs/default.yaml
-    
-  mlflow:
-    build: .
-    ports:
-      - "5000:5000"
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app/src
+    command: python scripts/train.py --dataset breast_cancer --generations 30 --population 50
+    networks:
+      - ga-network
+
+  # Experiment runner service
+  ga-experiment:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ga-trees-experiment
     volumes:
       - ./results:/app/results
-    command: mlflow ui --backend-store-uri /app/results/mlruns --host 0.0.0.0
-    
-  api:
-    build: .
-    ports:
-      - "8000:8000"
-    volumes:
       - ./models:/app/models
-    command: uvicorn src.ga_trees.api.main:app --host 0.0.0.0 --port 8000
+      - ./data:/app/data
+      - ./configs:/app/configs
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app/src
+    command: python scripts/experiment.py --config configs/default.yaml
+    networks:
+      - ga-network
+    profiles:
+      - experiment
+
+  # Hyperparameter optimization service
+  ga-optuna:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ga-trees-optuna
+    volumes:
+      - ./results:/app/results
+      - ./configs:/app/configs
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app/src
+    command: python scripts/hyperopt_with_optuna.py
+    networks:
+      - ga-network
+    profiles:
+      - optuna
+
+  # Jupyter notebook service for exploration
+  ga-notebook:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ga-trees-notebook
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/app/notebooks
+      - ./results:/app/results
+      - ./models:/app/models
+      - ./data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app/src
+    command: jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token=''
+    networks:
+      - ga-network
+    profiles:
+      - notebook
+
+networks:
+  ga-network:
+    driver: bridge
+
+volumes:
+  results-data:
+  models-data:

@@ -118,14 +118,13 @@ configs/secrets.yaml
 # Temporary files
 *.tmp
 *.temp
+*.pyc
 
-
-
-# ملفات Windows المخفية
+# Windows files
 *.Identifier
 Thumbs.db
 ehthumbs.db
 Desktop.ini
 
-# ملفات Zone.Identifier
+# Windows Zone.Identifier
 *:Zone.Identifier
