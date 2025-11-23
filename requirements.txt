@@ -21,7 +21,6 @@ fastapi==0.121.3
 Flask==3.1.2
 flask-cors==6.0.1
 fonttools==4.60.1
--e git+https://github.com/ibrah5em/ga-optimized-trees.git@0f84634f319ea67ca69c83fb833ce869af8a773f#egg=ga_optimized_trees
 gitdb==4.0.12
 GitPython==3.1.45
 google-auth==2.43.0
