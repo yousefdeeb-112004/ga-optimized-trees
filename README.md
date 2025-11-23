@@ -122,7 +122,68 @@ ga-optimized-trees/
 
 ## Tasks 
 
--
+### **Phase 1: Core Foundation**
+
+* [ ] Building `dataset_loader.py` in `src/ga_trees/data`
+* [ ] Building `tree_genotype.py` in `src/ga_trees/genotype`
+* [ ] Building `calculator.py` in `src/ga_trees/fitness`
+* [ ] Building GA Engine in `src/ga_trees/ga/engine.py`
+* [ ] Building `multi_objective.py` in `src/ga_trees/ga`
+
+### **Phase 2: Testing Foundation**
+
+* [ ] `tests/unit/test_genotype.py`
+* [ ] `tests/unit/test_fitness.py`
+* [ ] `tests/unit/test_ga_engine.py`
+* [ ] `tests/unit/test_data_loader.py`
+* [ ] Create `tests/conftest.py`
+
+### **Phase 3: Evaluation & Metrics**
+
+* [ ] Building `metrics.py` in `src/ga_trees/evaluation`
+* [ ] Building `feature_importance.py` in `src/ga_trees/evaluation`
+* [ ] Building `tree_visualizer.py` in `src/ga_trees/evaluation`
+* [ ] Building `explainability.py` in `src/ga_trees/evaluation`
+
+### **Phase 4: Baselines & Comparison**
+
+* [ ] Building `baseline_models.py` with Standard CART
+* [ ] Building `baseline_models.py` with CART with cost-complexity pruning
+* [ ] Building `baseline_models.py` with Random Forest ensemble
+* [ ] Building `baseline_models.py` with XGBoost baseline
+
+### **Phase 5: Utilities & Infrastructure**
+
+* [ ] Work on `src/ga_trees/utils` - Data normalization/standardization
+* [ ] Work on `src/ga_trees/utils` - Random seed management
+* [ ] Work on `src/ga_trees/utils` - Progress tracking
+* [ ] Work on `src/ga_trees/utils` - Statistical calculations
+* [ ] Work on `src/ga_trees/utils` - Cross-validation helpers
+* [ ] Work on `src/ga_trees/utils` - Parameter validation
+* [ ] Implement `src/ga_trees/tracking`
+* [ ] Work on `src/ga_trees/api`
+
+### **Phase 6: Packaging & Deployment**
+
+* [ ] Focus on `pyproject.toml`
+* [ ] Work on `docker-compose.yml`
+* [ ] Work on `Dockerfile`
+
+### **Phase 7: Documentation & Examples**
+
+* [ ] Work in notebooks for project readability
+
+### **Phase 8: Extended Testing**
+
+* [ ] `tests/unit/test_evaluation_metrics.py`
+* [ ] `tests/unit/test_feature_importance.py`
+* [ ] `tests/unit/test_baselines.py`
+* [ ] `tests/unit/test_utils.py`
+* [ ] `tests/integration/test_ga_workflow.py`
+* [ ] `tests/integration/test_full_pipeline.py`
+* [ ] `tests/integration/test_model_training.py`
+
+
 
 ## 🔬 Example Results
 
