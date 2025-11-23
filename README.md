@@ -119,6 +119,56 @@ ga-optimized-trees/
 └── results/                    # Experiment outputs and figures
 ```
 
+## Implementation Milestones
+
+### Phase 1: Foundation 
+**Goal**: Core infrastructure and basic GA
+
+- [ ] Repository setup (structure, CI/CD, docs)
+- [ ] Genotype/Node classes with constraints
+- [ ] Basic GA engine (selection, crossover, mutation)
+- [ ] Simple fitness (accuracy only)
+- [ ] Synthetic data generator
+- [ ] Unit tests for genotype operations
+
+**Deliverable**: GA can evolve trees on synthetic data
+
+### Phase 2: Fitness & Baselines 
+**Goal**: Complete fitness function and comparisons
+
+- [ ] Interpretability composite metric
+- [ ] Multi-objective fitness (weighted-sum)
+- [ ] Baseline implementations (CART, RF, XGBoost)
+- [ ] Data loaders for UCI datasets
+- [ ] Cross-validation framework
+- [ ] Integration tests
+
+**Deliverable**: Full fitness evaluation, baseline comparisons work
+
+### Phase 3: Multi-Objective & Evaluation 
+**Goal**: Pareto optimization and statistical rigor
+
+- [ ] NSGA-II integration via DEAP
+- [ ] Pareto front computation and visualization
+- [ ] Statistical testing framework
+- [ ] Experiment tracking (MLflow)
+- [ ] Hyperparameter tuning with Optuna
+- [ ] Ablation study scripts
+
+**Deliverable**: Multi-objective optimization working, experiments reproducible
+
+### Phase 4: Optimization & Refinement 
+**Goal**: Performance, documentation, polish
+
+- [ ] Parallelization (joblib/multiprocessing)
+- [ ] Profiling and optimization
+- [ ] Comprehensive documentation
+- [ ] Example notebooks
+- [ ] API endpoint (FastAPI)
+- [ ] Docker containerization
+- [ ] Final testing and benchmarking
+
+**Deliverable**: Production-ready, documented, performant system
 
 ## Tasks 
 
@@ -182,8 +232,6 @@ ga-optimized-trees/
 * [ ] `tests/integration/test_ga_workflow.py`
 * [ ] `tests/integration/test_full_pipeline.py`
 * [ ] `tests/integration/test_model_training.py`
-
-
 
 ## 🔬 Example Results
 
