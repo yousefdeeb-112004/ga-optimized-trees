@@ -43,24 +43,7 @@ python scripts/experiment.py --config configs/optimized.yaml
 - **🎯 Interpretability Metrics**: Composite scoring including tree complexity, balance, and feature coherence
 - **🐳 Docker Support**: Reproducible containerized execution
 
-## 🏗️ Architecture Overview
-
-```mermaid
-graph TB
-    A[Data Loader] --> B[GA Engine]
-    B --> C[Fitness Evaluation]
-    C --> D[Multi-Objective Optimization]
-    D --> E[Pareto Front]
-    E --> F[Model Selection]
-    F --> G[Interpretable Tree]
-    
-    H[Baseline Models] --> I[Comparison]
-    G --> I
-    I --> J[Statistical Analysis]
-```
-
 ## 🧪 Running Experiments
-
 
 ### Multi-objective Optimization
   
