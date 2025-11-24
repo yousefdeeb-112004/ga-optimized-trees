@@ -167,7 +167,6 @@ ga-optimized-trees/
 
 ## 🐳 Docker Usage
 
-> [!NOTE] Note
 > The Docker setup is currently under development and these commands may not work as expected. We are working to stabilize the containerized environment.
 
 ```bash
@@ -249,7 +248,7 @@ fitness:
     accuracy: 0.7
     interpretability: 0.3
 ```
-> [!NOTE] Note
+
 > The current implementation uses weighted sum fitness. True Pareto-based multi-objective optimization (NSGA-II) is planned for future releases.
 
 ## 🤝 Contributing
