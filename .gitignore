@@ -81,6 +81,7 @@ models/*
 results/*.json
 results/*.csv
 results/*.pkl
+results/*.yaml
 results/mlruns/
 results/benchmark/
 
