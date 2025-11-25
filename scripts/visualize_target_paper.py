@@ -1,12 +1,17 @@
 """
 Create publication-quality figures for research paper/thesis.
 Highlights the key achievements: 48% size reduction and p=0.64 equivalence.
-to see the same results in this visualzier, run python scripts/experiment.py --config configs/target.yaml
+to see the same results in this visualizer, run:
+    python scripts/experiment.py --config configs/target.yaml
 """
 
+import os
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+
+# Ensure output directory exists
+os.makedirs('results/figures', exist_ok=True)
 
 # Set publication style
 plt.rcParams['font.family'] = 'serif'
@@ -21,7 +26,7 @@ results = {
     'breast_cancer': {'ga_acc': 91.05, 'cart_acc': 91.57, 'ga_nodes': 6.5, 'cart_nodes': 35.5, 'p_val': 0.640}
 }
 
-# FIGURE 1: The Money Shot - Size Reduction with Target Line
+# FIGURE 1: Size Reduction
 fig, ax = plt.subplots(figsize=(8, 5))
 
 datasets = ['Iris', 'Wine', 'Breast\nCancer']
@@ -32,113 +37,112 @@ reductions = [55, 48, 82]
 x = np.arange(len(datasets))
 width = 0.35
 
-bars1 = ax.bar(x - width/2, ga_nodes, width, label='GA', color='#2ecc71', edgecolor='black', linewidth=1.5)
-bars2 = ax.bar(x + width/2, cart_nodes, width, label='CART', color='#e74c3c', alpha=0.7, edgecolor='black', linewidth=1.5)
+bars_ga = ax.bar(x - width/2, ga_nodes, width, label='GA', color='#2ecc71', edgecolor='black', linewidth=1.2)
+bars_cart = ax.bar(x + width/2, cart_nodes, width, label='CART', color='#e74c3c', alpha=0.85, edgecolor='black', linewidth=1.2)
 
-# Add reduction percentages
+# Add reduction percentages (no emoji, no special symbols)
 for i, (ga, cart, red) in enumerate(zip(ga_nodes, cart_nodes, reductions)):
     y_pos = max(ga, cart) + 2
-    color = '#27ae60' if red >= 46 and red <= 49 else '#3498db'
-    marker = '★' if red >= 46 and red <= 49 else ''
-    ax.text(i, y_pos, f'{red}%↓ {marker}', ha='center', fontsize=11, fontweight='bold', color=color)
+    color = '#27ae60' if 46 <= red <= 49 else '#2c3e50'
+    ax.text(i, y_pos, f'{red}%', ha='center', fontsize=11, fontweight='bold', color=color)
 
-# Target zone
-ax.axhspan(0, 50, alpha=0.05, color='green', zorder=0)
-ax.text(2.5, 25, '', fontsize=9, ha='right', color='darkgreen', style='italic')
+# Optional: highlight a horizontal band (example kept neutral)
+# If you prefer a specific band for the target zone, adjust the ymin/ymax accordingly.
+# Example commented out (uncomment if desired):
+# ax.axhspan(0, 50, alpha=0.03, color='gray', zorder=0)
 
 ax.set_ylabel('Number of Nodes', fontsize=12, fontweight='bold')
 ax.set_xlabel('Dataset', fontsize=12, fontweight='bold')
-ax.set_title('GA Achieves 46-82% Tree Size Reduction\n', fontsize=13, fontweight='bold', pad=15)
+ax.set_title('GA Achieves 46–82% Tree Size Reduction', fontsize=13, fontweight='bold', pad=12)
 ax.set_xticks(x)
 ax.set_xticklabels(datasets, fontsize=11)
-ax.legend(loc='upper left', fontsize=11, framealpha=0.95)
-ax.grid(axis='y', alpha=0.3, linestyle='--')
+ax.legend(loc='upper left', fontsize=10, framealpha=0.95)
+ax.grid(axis='y', alpha=0.25, linestyle='--')
 ax.set_ylim(0, 40)
 
 plt.tight_layout()
 plt.savefig('results/figures/paper_fig1_size_reduction.png', dpi=300, bbox_inches='tight')
 plt.savefig('results/figures/paper_fig1_size_reduction.pdf', bbox_inches='tight')
-print("✓ Figure 1 saved (Size Reduction)")
+print("Figure 1 saved (Size Reduction)")
 
 # FIGURE 2: Statistical Equivalence - The p-value Plot
 fig, ax = plt.subplots(figsize=(8, 5))
 
 datasets = ['Iris', 'Wine', 'Breast Cancer']
 p_values = [0.186, 0.683, 0.640]
-colors = ['#3498db', '#3498db', '#27ae60']  # Green for target achievement
+colors = ['#3498db', '#3498db', '#27ae60']  # Green for the target achievement
 
-bars = ax.barh(datasets, p_values, color=colors, edgecolor='black', linewidth=1.5, alpha=0.85)
+bars = ax.barh(datasets, p_values, color=colors, edgecolor='black', linewidth=1.2, alpha=0.9)
 
 # Significance threshold line
-ax.axvline(0.05, color='red', linestyle='--', linewidth=2, label='α = 0.05 (significance threshold)')
+ax.axvline(0.05, color='red', linestyle='--', linewidth=1.8, label='α = 0.05 (significance threshold)')
 
-# Target line for breast cancer
-ax.axvline(0.55, color='orange', linestyle=':', linewidth=2, alpha=0.7, label='Target p-value (0.55)')
+# Target line example (adjust if you have a different target)
+ax.axvline(0.55, color='orange', linestyle=':', linewidth=1.8, alpha=0.8, label='Target p-value (0.55)')
 
-# Annotations
+# Annotations (plain text, no emojis)
 for i, (dataset, p) in enumerate(zip(datasets, p_values)):
     label = f'p = {p:.3f}'
-    if dataset == 'Wine' and p >= 0.46 and p <= 0.49:
-        label += ' ★'
-    if dataset == 'Breast Cancer' and p >= 0.55:
-        label += ' ✓ Target!'
+    # Example target labels (kept plain): uncomment or change logic as desired
+    # if dataset == 'Breast Cancer' and p >= 0.55:
+    #     label += '  Target'
     ax.text(p + 0.03, i, label, va='center', fontsize=11, fontweight='bold')
 
 ax.set_xlabel('p-value (Paired t-test, 20-fold CV)', fontsize=12, fontweight='bold')
 ax.set_title('Statistical Equivalence to CART\n(All p > 0.05 = No Significant Difference)', 
-             fontsize=13, fontweight='bold', pad=15)
+             fontsize=13, fontweight='bold', pad=12)
 ax.legend(loc='lower right', fontsize=10)
 ax.set_xlim(0, 0.75)
-ax.grid(axis='x', alpha=0.3, linestyle='--')
+ax.grid(axis='x', alpha=0.25, linestyle='--')
 
 plt.tight_layout()
 plt.savefig('results/figures/paper_fig2_statistical_equiv.png', dpi=300, bbox_inches='tight')
 plt.savefig('results/figures/paper_fig2_statistical_equiv.pdf', bbox_inches='tight')
-print("✓ Figure 2 saved (Statistical Equivalence)")
+print("Figure 2 saved (Statistical Equivalence)")
 
 # FIGURE 3: Accuracy-Interpretability Trade-off Scatter
 fig, ax = plt.subplots(figsize=(8, 6))
 
+# Plot each dataset's GA and CART points (no emoji)
 for dataset, data in results.items():
     # GA point
-    ax.scatter(data['ga_nodes'], data['ga_acc'], s=400, alpha=0.8, 
-               color='#2ecc71', marker='o', edgecolors='black', linewidth=2, label=f'GA - {dataset}')
+    ax.scatter(data['ga_nodes'], data['ga_acc'], s=200, alpha=0.85, 
+               color='#2ecc71', marker='o', edgecolors='black', linewidth=1.2, label=f'GA - {dataset}')
     # CART point
-    ax.scatter(data['cart_nodes'], data['cart_acc'], s=300, alpha=0.6,
-               color='#e74c3c', marker='s', edgecolors='black', linewidth=2, label=f'CART - {dataset}')
+    ax.scatter(data['cart_nodes'], data['cart_acc'], s=140, alpha=0.8,
+               color='#e74c3c', marker='s', edgecolors='black', linewidth=1.2, label=f'CART - {dataset}')
     
-    # Connect with arrow
+    # Connect with arrow (gray)
     ax.annotate('', xy=(data['ga_nodes'], data['ga_acc']), 
                 xytext=(data['cart_nodes'], data['cart_acc']),
-                arrowprops=dict(arrowstyle='->', lw=1.5, color='gray', alpha=0.5))
+                arrowprops=dict(arrowstyle='->', lw=1.2, color='gray', alpha=0.6))
 
-# Ideal region
-ax.axhspan(90, 95, alpha=0.05, color='green', zorder=0)
-ax.axvspan(0, 15, alpha=0.05, color='blue', zorder=0)
-ax.text(7.5, 94.5, '← Ideal Region', fontsize=10, color='darkgreen', fontweight='bold')
+# Ideal region (subtle shading)
+ax.axhspan(90, 95, alpha=0.03, color='green', zorder=0)
+ax.axvspan(0, 15, alpha=0.03, color='blue', zorder=0)
+ax.text(8.0, 94.5, 'Ideal region', fontsize=10, color='darkgreen', fontweight='bold')
 
 ax.set_xlabel('Tree Size (Number of Nodes)', fontsize=12, fontweight='bold')
 ax.set_ylabel('Accuracy (%)', fontsize=12, fontweight='bold')
 ax.set_title('GA Finds Pareto-Optimal Solutions\n(Smaller trees, competitive accuracy)', 
-             fontsize=13, fontweight='bold', pad=15)
-ax.grid(True, alpha=0.3, linestyle='--')
+             fontsize=13, fontweight='bold', pad=12)
+ax.grid(True, alpha=0.25, linestyle='--')
 ax.set_xlim(0, 40)
 ax.set_ylim(85, 96)
 
-# Legend with summary
-handles, labels = ax.get_legend_handles_labels()
+# Custom legend
 legend_elements = [
     plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='#2ecc71', 
-               markersize=12, label='GA (Smaller)', markeredgecolor='black', markeredgewidth=1.5),
+               markersize=10, label='GA (Smaller)', markeredgecolor='black', markeredgewidth=1.2),
     plt.Line2D([0], [0], marker='s', color='w', markerfacecolor='#e74c3c', 
-               markersize=10, label='CART (Baseline)', markeredgecolor='black', markeredgewidth=1.5)
+               markersize=8, label='CART (Baseline)', markeredgecolor='black', markeredgewidth=1.2)
 ]
 ax.legend(handles=legend_elements, loc='lower right', fontsize=11, framealpha=0.95)
 
 plt.tight_layout()
 plt.savefig('results/figures/paper_fig3_pareto_tradeoff.png', dpi=300, bbox_inches='tight')
 plt.savefig('results/figures/paper_fig3_pareto_tradeoff.pdf', bbox_inches='tight')
-print("✓ Figure 3 saved (Pareto Trade-off)")
+print("Figure 3 saved (Pareto Trade-off)")
 
 # FIGURE 4: Comparison Table as Image (for slides)
 fig, ax = plt.subplots(figsize=(12, 4))
@@ -147,7 +151,7 @@ ax.axis('off')
 table_data = [
     ['Iris', '94.55 ± 8.07%', '92.41 ± 10.43%', '0.186', '7.4', '16.4', '55%'],
     ['Wine', '88.19 ± 10.39%', '87.22 ± 10.70%', '0.683', '10.7', '20.7', '48%'],
-    ['Breast Cancer', '91.05 ± 5.60%', '91.57 ± 3.92%', '0.640 ✓', '6.5', '35.5', '82%']
+    ['Breast Cancer', '91.05 ± 5.60%', '91.57 ± 3.92%', '0.640', '6.5', '35.5', '82%']
 ]
 
 headers = ['Dataset', 'GA Accuracy', 'CART Accuracy', 'p-value', 'GA Nodes', 'CART Nodes', 'Reduction']
@@ -159,38 +163,42 @@ table.set_fontsize(10)
 table.scale(1, 2.5)
 
 # Style header
-for i in range(len(headers)):
-    cell = table[(0, i)]
+for col_idx in range(len(headers)):
+    cell = table[(0, col_idx)]
     cell.set_facecolor('#34495e')
     cell.set_text_props(weight='bold', color='white')
 
-# Highlight achievements
-for i in range(1, 4):
+# Highlight achievements (plain coloring, no emoji)
+for row_idx in range(1, len(table_data) + 1):
     # p-value column - green if > 0.05
-    cell = table[(i, 3)]
-    if float(table_data[i-1][3].split()[0]) > 0.05:
-        cell.set_facecolor('#d5f4e6')
+    cell_p = table[(row_idx, 3)]
+    try:
+        pval = float(table_data[row_idx - 1][3].split()[0])
+    except Exception:
+        pval = None
+    if pval is not None and pval > 0.05:
+        cell_p.set_facecolor('#d5f4e6')
     
-    # Reduction column - green if 46-49%
-    cell = table[(i, 6)]
-    reduction = int(table_data[i-1][6].replace('%', '').split()[0])
+    # Reduction column - gold if 46-49%, otherwise green tint
+    cell_red = table[(row_idx, 6)]
+    reduction = int(table_data[row_idx - 1][6].replace('%', '').split()[0])
     if 46 <= reduction <= 49:
-        cell.set_facecolor('#f9e79f')  # Gold for exact target
+        cell_red.set_facecolor('#f9e79f')  # gold for exact target
     else:
-        cell.set_facecolor('#d5f4e6')
+        cell_red.set_facecolor('#d5f4e6')
 
-ax.set_title('Complete Results Summary (20-fold CV)', fontsize=14, fontweight='bold', pad=20)
+ax.set_title('Complete Results Summary (20-fold CV)', fontsize=14, fontweight='bold', pad=12)
 
 plt.tight_layout()
 plt.savefig('results/figures/paper_table_summary.png', dpi=300, bbox_inches='tight')
-print("✓ Summary table saved")
+print("Summary table saved")
 
 print("\n" + "="*70)
-print("✅ All paper-quality figures generated!")
+print("All paper-quality figures generated.")
 print("="*70)
 print("\nFiles created:")
-print("  1. paper_fig1_size_reduction.png/pdf (The 48% achievement)")
-print("  2. paper_fig2_statistical_equiv.png/pdf (The p=0.64 proof)")
+print("  1. paper_fig1_size_reduction.png/pdf (Size reduction)")
+print("  2. paper_fig2_statistical_equiv.png/pdf (p-value plot)")
 print("  3. paper_fig3_pareto_tradeoff.png/pdf (Trade-off visualization)")
 print("  4. paper_table_summary.png (Results table)")
-print("\n💡 Use these for your paper/presentation!")
+print("\nUse these for your paper/presentation.")
