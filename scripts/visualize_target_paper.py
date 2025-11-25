@@ -44,11 +44,11 @@ for i, (ga, cart, red) in enumerate(zip(ga_nodes, cart_nodes, reductions)):
 
 # Target zone
 ax.axhspan(0, 50, alpha=0.05, color='green', zorder=0)
-ax.text(2.5, 25, 'Target Zone:\n46-49% reduction', fontsize=9, ha='right', color='darkgreen', style='italic')
+ax.text(2.5, 25, '', fontsize=9, ha='right', color='darkgreen', style='italic')
 
 ax.set_ylabel('Number of Nodes', fontsize=12, fontweight='bold')
 ax.set_xlabel('Dataset', fontsize=12, fontweight='bold')
-ax.set_title('GA Achieves 46-82% Tree Size Reduction\n(Wine: 48% - Exact Target)', fontsize=13, fontweight='bold', pad=15)
+ax.set_title('GA Achieves 46-82% Tree Size Reduction\n', fontsize=13, fontweight='bold', pad=15)
 ax.set_xticks(x)
 ax.set_xticklabels(datasets, fontsize=11)
 ax.legend(loc='upper left', fontsize=11, framealpha=0.95)
@@ -146,7 +146,7 @@ ax.axis('off')
 
 table_data = [
     ['Iris', '94.55 ± 8.07%', '92.41 ± 10.43%', '0.186', '7.4', '16.4', '55%'],
-    ['Wine', '88.19 ± 10.39%', '87.22 ± 10.70%', '0.683', '10.7', '20.7', '48% ★'],
+    ['Wine', '88.19 ± 10.39%', '87.22 ± 10.70%', '0.683', '10.7', '20.7', '48%'],
     ['Breast Cancer', '91.05 ± 5.60%', '91.57 ± 3.92%', '0.640 ✓', '6.5', '35.5', '82%']
 ]
 
