@@ -80,15 +80,20 @@ models/*
 # Results - ignore most, keep figures
 results/*.json
 results/*.csv
-results/*.pkl
 results/*.yaml
-results/mlruns/
-results/benchmark/
+results/*.pkl
+results/benchmark/*.yaml
+results/benchmark/*.json 
+results/benchmark/*.csv
+
+results/optimization/*.json
+
 
 # figures for README
 !results/figures/*.png
 !results/.gitkeep
-
+!results/benchmarks/.gitkeep
+!results/optimization/.gitkeep
 # MLFlow
 mlruns/
 
