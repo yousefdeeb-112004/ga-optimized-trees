@@ -86,7 +86,7 @@ results/benchmark/*.yaml
 results/benchmark/*.json 
 results/benchmark/*.csv
 
-results/optimization/*.json
+
 
 
 # figures for README
