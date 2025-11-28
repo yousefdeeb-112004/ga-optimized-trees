@@ -76,7 +76,7 @@ class DataValidator:
     
     @staticmethod
     def clean_dataset(X: np.ndarray, y: np.ndarray, 
-                     strategy: str = 'remove') -> Tuple[np.ndarray, np.ndarray]:
+                     strategy: str = 'median') -> Tuple[np.ndarray, np.ndarray]:
         """
         Clean dataset by handling missing/invalid values.
         
@@ -99,7 +99,7 @@ class DataValidator:
                     mask = np.isnan(X[:, i]) | np.isinf(X[:, i])
                     X[mask, i] = col_means[i]
             elif strategy == 'median':
-                # Replace with column median
+                # Replace with column median (more robust)
                 col_medians = np.nanmedian(X, axis=0)
                 for i in range(X.shape[1]):
                     mask = np.isnan(X[:, i]) | np.isinf(X[:, i])
@@ -204,8 +204,8 @@ class DatasetLoader:
         if warnings:
             print(f"⚠ Warnings: {warnings}")
         
-        # Clean if needed
-        X, y = self.validator.clean_dataset(X, y)
+        # Clean if needed (use median by default - more robust)
+        X, y = self.validator.clean_dataset(X, y, strategy='median')
         
         # Balance if requested
         if balance:
@@ -284,15 +284,34 @@ class DatasetLoader:
         try:
             data = fetch_openml(data_id=dataset_id, as_frame=True, parser='auto')
             
-            X = data.data.values
+            # Get dataframe for easier processing
+            df = data.data.copy()
             y = data.target.values
             
-            # Encode labels if necessary
-            if y.dtype == object or isinstance(y[0], str):
+            # Encode categorical features
+            for col in df.columns:
+                if df[col].dtype == 'object' or df[col].dtype.name == 'category':
+                    # Convert to string first (handles categorical dtype properly)
+                    df[col] = df[col].astype(str)
+                    # Replace 'nan' string with a placeholder
+                    df[col] = df[col].replace('nan', 'missing_value')
+                    # Now encode
+                    le = LabelEncoder()
+                    df[col] = le.fit_transform(df[col])
+                elif df[col].dtype in ['float64', 'float32', 'int64', 'int32']:
+                    # For numeric columns, fill NaN with median
+                    if df[col].isna().any():
+                        df[col] = df[col].fillna(df[col].median())
+            
+            X = df.values.astype(float)
+            
+            # Encode labels if necessary  
+            if y.dtype == object or (len(y) > 0 and isinstance(y[0], str)):
                 le = LabelEncoder()
-                y = le.fit_transform(y)
+                y = le.fit_transform(y.astype(str))
                 target_names = list(le.classes_)
             else:
+                y = y.astype(int)
                 target_names = None
             
             feature_names = list(data.feature_names)
@@ -307,14 +326,33 @@ class DatasetLoader:
         try:
             data = fetch_openml(name=name, version=1, as_frame=True, parser='auto')
             
-            X = data.data.values
+            # Get dataframe for easier processing
+            df = data.data.copy()
             y = data.target.values
             
-            if y.dtype == object:
+            # Encode categorical features
+            for col in df.columns:
+                if df[col].dtype == 'object' or df[col].dtype.name == 'category':
+                    # Convert to string first
+                    df[col] = df[col].astype(str)
+                    # Replace 'nan' with placeholder
+                    df[col] = df[col].replace('nan', 'missing_value')
+                    # Encode
+                    le = LabelEncoder()
+                    df[col] = le.fit_transform(df[col])
+                elif df[col].dtype in ['float64', 'float32', 'int64', 'int32']:
+                    # For numeric columns, fill NaN with median
+                    if df[col].isna().any():
+                        df[col] = df[col].fillna(df[col].median())
+            
+            X = df.values.astype(float)
+            
+            if y.dtype == object or (len(y) > 0 and isinstance(y[0], str)):
                 le = LabelEncoder()
-                y = le.fit_transform(y)
+                y = le.fit_transform(y.astype(str))
                 target_names = list(le.classes_)
             else:
+                y = y.astype(int)
                 target_names = None
             
             feature_names = list(data.feature_names)
