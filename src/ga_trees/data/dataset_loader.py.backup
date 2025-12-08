@@ -1,10 +1,8 @@
 """
-Enhanced Dataset Loader with OpenML, UCI, and Custom Format Support - FIXED VERSION
+Enhanced Dataset Loader with OpenML, UCI, and Custom Format Support - COMPLETE FIXED VERSION
 
-FIXES APPLIED:
-1. Added parser='auto' to all fetch_openml() calls
-2. Added comprehensive file integrity validation
-3. Preserved class name information with label encoder storage
+FILE PATH: /home/yousef/ga-optimized-trees/src/ga_trees/data/dataset_loader.py
+ACTION: REPLACE THE ENTIRE FILE
 
 Features:
 - OpenML integration for 1000+ datasets
@@ -14,6 +12,12 @@ Features:
 - Data validation and type checking
 - Support for imbalanced data
 - Comprehensive error handling
+
+FIXES APPLIED:
+1. Reduced minimum sample requirement from 10 to dynamic based on test_size
+2. Better error handling for file not found vs unknown dataset
+3. Improved small dataset handling with warnings
+4. Better validation messages
 """
 
 import pandas as pd
@@ -196,33 +200,65 @@ class DatasetLoader:
         elif Path(name).exists():
             X, y, feature_names, target_names = self._load_file(name)
         else:
-            # Try OpenML by name
-            try:
-                X, y, feature_names, target_names = self._load_openml_by_name(name)
-            except:
-                raise ValueError(f"Unknown dataset: {name}")
+            # FIX: Better distinction between file paths and dataset names
+            # Check if it looks like a file path
+            if ('.' in name and 
+                ('/' in name or '\\' in name or 
+                 name.endswith('.csv') or name.endswith('.xlsx') or name.endswith('.xls'))):
+                raise FileNotFoundError(f"File not found: {name}")
+            else:
+                # Try OpenML by name as last resort
+                try:
+                    X, y, feature_names, target_names = self._load_openml_by_name(name)
+                except:
+                    raise ValueError(f"Unknown dataset: {name}")
         
         # Validate
         valid, warnings = self.validator.validate_dataset(X, y)
         if not valid:
             raise ValueError(f"Invalid dataset: {warnings}")
         if warnings:
-            print(f"⚠ Warnings:")
+            print(f"\n⚠️  Data Quality Warnings:")
             for i, warning in enumerate(warnings, 1):
                 print(f"  {i}. {warning}")
         
         # Clean if needed (use median by default - more robust)
         X, y = self.validator.clean_dataset(X, y, strategy='median')
         
+        # FIX: Dynamic minimum dataset size based on test_size
+        # More flexible than fixed minimum of 10
+        min_samples_required = max(5, int(1 / test_size) + 2)
+        
+        if len(X) < min_samples_required:
+            # Try to continue with warning for very small datasets
+            if len(X) >= 5:
+                print(f"\n⚠️  Warning: Small dataset ({len(X)} samples). " 
+                      f"Results may not be reliable.")
+            else:
+                raise ValueError(
+                    f"Dataset too small: {len(X)} samples. "
+                    f"Need at least {min_samples_required} for test_size={test_size}. "
+                    f"Consider using a smaller test_size or adding more samples."
+                )
+        
         # Balance if requested
         if balance:
             X, y = self._balance_dataset(X, y, strategy=balance, random_state=random_state)
         
-        # Train/test split
+        # Train/test split with error handling
         stratify_labels = y if stratify else None
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=test_size, random_state=random_state, stratify=stratify_labels
-        )
+        try:
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, test_size=test_size, random_state=random_state, stratify=stratify_labels
+            )
+        except ValueError as e:
+            if 'stratify' in str(e).lower():
+                print("⚠️  Stratification failed (likely too few samples per class). Using random split.")
+                X_train, X_test, y_train, y_test = train_test_split(
+                    X, y, test_size=test_size, random_state=random_state, stratify=None
+                )
+            else:
+                raise
         
         # Standardize if requested
         scaler = None
@@ -241,7 +277,7 @@ class DatasetLoader:
             'feature_names': feature_names,
             'target_names': target_names,
             'balanced': balance is not None,
-            'standardized': standardize
+            'standardized': standardize,
         }
         
         print(f"✓ Loaded: {metadata['n_samples']} samples, "
@@ -287,47 +323,33 @@ class DatasetLoader:
         return self._load_openml_by_id(dataset_id)
     
     def _load_openml_by_id(self, dataset_id: int) -> Tuple:
-        """
-        Load OpenML dataset by ID.
-        
-        FIX #1: Added parser='auto' parameter
-        """
+        """Load OpenML dataset by ID."""
         try:
-            # CRITICAL FIX: Added parser='auto' for pandas compatibility
             data = fetch_openml(data_id=dataset_id, as_frame=True, parser='auto')
             
-            # Get dataframe for easier processing
             df = data.data.copy()
             y = data.target.values
             
             # Encode categorical features
             for col in df.columns:
                 if df[col].dtype == 'object' or df[col].dtype.name == 'category':
-                    # Convert to string first (handles categorical dtype properly)
                     df[col] = df[col].astype(str)
-                    # Replace 'nan' string with a placeholder
                     df[col] = df[col].replace('nan', 'missing_value')
-                    # Now encode
                     le = LabelEncoder()
                     df[col] = le.fit_transform(df[col])
                 elif df[col].dtype in ['float64', 'float32', 'int64', 'int32']:
-                    # For numeric columns, fill NaN with median
                     if df[col].isna().any():
                         df[col] = df[col].fillna(df[col].median())
             
             X = df.values.astype(float)
             
-            # FIX #3: Store original class names before encoding
-            original_target_names = None
+            # Encode labels
             if y.dtype == object or (len(y) > 0 and isinstance(y[0], str)):
-                # Store original unique values
-                original_target_names = list(np.unique(y.astype(str)))
                 le = LabelEncoder()
                 y = le.fit_transform(y.astype(str))
                 target_names = list(le.classes_)
             else:
                 y = y.astype(int)
-                # Even for numeric targets, store unique values
                 target_names = list(np.unique(y))
             
             feature_names = list(data.feature_names)
@@ -338,40 +360,27 @@ class DatasetLoader:
             raise RuntimeError(f"Failed to load OpenML dataset {dataset_id}: {e}")
     
     def _load_openml_by_name(self, name: str) -> Tuple:
-        """
-        Load OpenML dataset by name.
-        
-        FIX #1: Added parser='auto' parameter
-        """
+        """Load OpenML dataset by name."""
         try:
-            # CRITICAL FIX: Added parser='auto' for pandas compatibility
             data = fetch_openml(name=name, version=1, as_frame=True, parser='auto')
             
-            # Get dataframe for easier processing
             df = data.data.copy()
             y = data.target.values
             
             # Encode categorical features
             for col in df.columns:
                 if df[col].dtype == 'object' or df[col].dtype.name == 'category':
-                    # Convert to string first
                     df[col] = df[col].astype(str)
-                    # Replace 'nan' with placeholder
                     df[col] = df[col].replace('nan', 'missing_value')
-                    # Encode
                     le = LabelEncoder()
                     df[col] = le.fit_transform(df[col])
                 elif df[col].dtype in ['float64', 'float32', 'int64', 'int32']:
-                    # For numeric columns, fill NaN with median
                     if df[col].isna().any():
                         df[col] = df[col].fillna(df[col].median())
             
             X = df.values.astype(float)
             
-            # FIX #3: Store original class names
-            original_target_names = None
             if y.dtype == object or (len(y) > 0 and isinstance(y[0], str)):
-                original_target_names = list(np.unique(y.astype(str)))
                 le = LabelEncoder()
                 y = le.fit_transform(y.astype(str))
                 target_names = list(le.classes_)
@@ -387,24 +396,20 @@ class DatasetLoader:
             raise RuntimeError(f"Failed to load OpenML dataset '{name}': {e}")
     
     def _load_file(self, filepath: str) -> Tuple:
-        """
-        Load dataset from CSV or Excel file.
-        
-        FIX #2: Added comprehensive file integrity validation
-        """
+        """Load dataset from CSV or Excel file."""
         path = Path(filepath)
         
         if not path.exists():
             raise FileNotFoundError(f"File not found: {filepath}")
         
-        # FIX #2: Load with comprehensive error handling
+        # Load based on extension
         try:
             if path.suffix == '.csv':
                 df = pd.read_csv(filepath)
             elif path.suffix in ['.xlsx', '.xls']:
                 df = pd.read_excel(filepath)
             else:
-                raise ValueError(f"Unsupported file format: {path.suffix}")
+                raise ValueError(f"Unsupported file format: {path.suffix}. Supported: .csv, .xlsx, .xls")
         except pd.errors.EmptyDataError:
             raise ValueError(f"File is empty: {filepath}")
         except pd.errors.ParserError as e:
@@ -412,7 +417,7 @@ class DatasetLoader:
         except Exception as e:
             raise ValueError(f"Failed to load file {filepath}: {e}")
         
-        # FIX #2: Validate loaded dataframe
+        # Validate loaded dataframe
         if df.empty:
             raise ValueError(f"File contains no data: {filepath}")
         if df.shape[1] < 2:
@@ -424,15 +429,12 @@ class DatasetLoader:
         X = df.iloc[:, :-1].values
         y = df.iloc[:, -1].values
         
-        # FIX #3: Store original target info before encoding
-        original_target_names = None
+        # Encode target if needed
         if y.dtype == object or isinstance(y[0], str):
-            original_target_names = list(np.unique(y))  # Store originals
             le = LabelEncoder()
             y = le.fit_transform(y)
             target_names = list(le.classes_)
         else:
-            # Even for numeric targets, store unique values
             target_names = list(np.unique(y))
         
         feature_names = list(df.columns[:-1])
@@ -453,7 +455,6 @@ class DatasetLoader:
         unique_classes, counts = np.unique(y, return_counts=True)
         
         if strategy == 'oversample':
-            # Oversample minority classes
             max_samples = counts.max()
             X_balanced, y_balanced = [], []
             
@@ -462,7 +463,6 @@ class DatasetLoader:
                 y_cls = y[y == cls]
                 
                 if len(X_cls) < max_samples:
-                    # Oversample
                     X_resampled, y_resampled = resample(
                         X_cls, y_cls, 
                         n_samples=max_samples, 
@@ -478,7 +478,6 @@ class DatasetLoader:
             y = np.hstack(y_balanced)
             
         elif strategy == 'undersample':
-            # Undersample majority classes
             min_samples = counts.min()
             X_balanced, y_balanced = [], []
             
@@ -487,7 +486,6 @@ class DatasetLoader:
                 y_cls = y[y == cls]
                 
                 if len(X_cls) > min_samples:
-                    # Undersample
                     X_resampled, y_resampled = resample(
                         X_cls, y_cls,
                         n_samples=min_samples,
@@ -551,12 +549,8 @@ def load_benchmark_dataset(name: str, **kwargs) -> Dict:
 if __name__ == '__main__':
     # Demo usage
     print("="*70)
-    print("GA-Trees Dataset Loader Demo - FIXED VERSION")
+    print("GA-Trees Dataset Loader - FIXED VERSION")
     print("="*70)
-    print("\nFIXES APPLIED:")
-    print("  ✓ FIX #1: Added parser='auto' to all fetch_openml() calls")
-    print("  ✓ FIX #2: Added comprehensive file integrity validation")
-    print("  ✓ FIX #3: Preserved class name information")
     
     # List available datasets
     available = DatasetLoader.list_available_datasets()
@@ -565,11 +559,11 @@ if __name__ == '__main__':
     print(f"  OpenML: {len(available['openml'])} datasets")
     
     # Load a dataset
-    print("\nTesting with Titanic dataset...")
-    data = load_benchmark_dataset('titanic', test_size=0.2, standardize=True)
+    print("\nLoading Iris dataset...")
+    data = load_benchmark_dataset('iris', test_size=0.2, standardize=True)
     
     print("\nDataset Info:")
     for key, value in data['metadata'].items():
         print(f"  {key}: {value}")
     
-    print("\n✓ All fixes verified and working!")
+    print("\n✓ Dataset loader ready!")
